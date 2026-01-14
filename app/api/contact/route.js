@@ -1,15 +1,3 @@
-import nodemailer from 'nodemailer';
-
-const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST,
-  port: process.env.EMAIL_PORT,
-  secure: true,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASSWORD,
-  },
-});
-
 export async function POST(request) {
   try {
     const { name, email, phone, message } = await request.json();
@@ -21,30 +9,17 @@ export async function POST(request) {
       );
     }
 
-    const mailOptions = {
-      from: process.env.EMAIL_FROM,
-      to: process.env.EMAIL_TO,
-      subject: `رسالة جديدة من ${name}`,
-      html: `
-        <h2>رسالة من نموذج الاتصال</h2>
-        <p><strong>الاسم:</strong> ${name}</p>
-        <p><strong>البريد:</strong> ${email}</p>
-        <p><strong>الهاتف:</strong> ${phone || 'لم يتم تقديمه'}</p>
-        <p><strong>الرسالة:</strong></p>
-        <p>${message.replace(/\n/g, '<br>')}</p>
-      `,
-    };
-
-    await transporter.sendMail(mailOptions);
+    // هنا يمكن حفظ البيانات في قاعدة بيانات أو إرسالها
+    console.log('رسالة جديدة:', { name, email, phone, message });
 
     return new Response(
-      JSON.stringify({ message: 'تم إرسال الرسالة بنجاح' }),
+      JSON.stringify({ message: 'تم استلام رسالتك بنجاح! سنتواصل معك قريباً' }),
       { status: 200, headers: { 'Content-Type': 'application/json' } }
     );
   } catch (error) {
-    console.error('خطأ في إرسال الرسالة:', error);
+    console.error('خطأ:', error);
     return new Response(
-      JSON.stringify({ error: 'حدث خطأ ما' }),
+      JSON.stringify({ error: 'حدث خطأ في معالجة الرسالة' }),
       { status: 500, headers: { 'Content-Type': 'application/json' } }
     );
   }
